@@ -4,6 +4,8 @@ const app = express();
 const cors=require('cors')
 const path = require('path')
 const User = require('./models/users')
+const env=require('dotenv')
+env.config()
 app.use(cors({
   origin: "http://127.0.0.1:5500"
 }));
@@ -16,7 +18,7 @@ app.use(userRoutes)
 app.use(express.static(path.join(__dirname, 'public')))
 User.sync()
 .then(
-app.listen('3000',()=>{
+app.listen(process.env.PORT,()=>{
   console.log('no error');
 }))
 .catch(err=>console.log(err))

@@ -1,18 +1,27 @@
 const myform=document.getElementById('my-form')
-console.log(myform);
 myform.addEventListener('submit',async (e)=>{
     try {
         e.preventDefault()
-        console.log('1');
         const email=document.getElementById('email')
         const password=document.getElementById('pwd')
         const login=await axios.post('http://localhost:3000/login',{
             email:email.value,
             password:password.value
         })
-        alert('Done')
+        // localStorage.setItem('token',login.data.token)
+        alert(login.data.message)
         location.reload()
     } catch (error) {
-        console.log(error);
+        if(error.response.status===404){
+            alert(error.response.data)
+            location.reload()
+        }
+         else if(error.response.status===401){
+            alert(error.response.data)
+            location.reload()
+        }
+        else{
+            alert("Sorry it's from our side please try again after some time")
+        }
     }
 })

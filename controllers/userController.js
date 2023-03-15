@@ -1,7 +1,10 @@
 const path = require('path')
 const rootDir = path.dirname(require.main.filename);
 const bcrypt = require('bcrypt')
-
+const jwt = require('jsonwebtoken')
+const env=require('dotenv')
+env.config()
+const SECRET_KEY=process.env.SECRET_KEY
 const User = require('../models/users')
 exports.signupPage = (req, res, next) => {
     res.sendFile(path.join(rootDir, 'public', 'html', 'signup.html'))
@@ -10,6 +13,10 @@ exports.signupPage = (req, res, next) => {
 exports.loginPage = (req, res, next) => {
     res.sendFile(path.join(rootDir, 'public', 'html', 'login.html'))
 }
+
+exports.generateAccessToken=(id, name,email) => {
+    return jwt.sign({ id: id, name: name, email:email}, SECRET_KEY);
+  }
 
 exports.createUser = async (req, res, next) => {
     try{
@@ -22,7 +29,6 @@ exports.createUser = async (req, res, next) => {
             const saltrounds = 10
             const hashPassword = await bcrypt.hash(password, saltrounds)
             const result = await User.create({ name: name, email: email, phone: phone, password: hashPassword })
-            // const token = jwt.sign({ email: result.email, id: result.id }, SECRET_KEY)
             res.status(201).json({ message: 'Successfully Created'})
             res.redirect('/')
         } else {
@@ -35,7 +41,19 @@ exports.createUser = async (req, res, next) => {
 
 exports.checkUser=async(req,res,next)=>{
     try {
-        console.log(req.body);
+        const email = req.body.email
+        const password = req.body.password
+        const user1 = await User.findOne({ where: { email: email } });
+        if (user1 === null) {
+            res.status(404).send('User Not Found')
+        } else {
+            const hash = user1.dataValues.password
+            await bcrypt.compare(password, hash, function (err, result) {
+                if (result === false) {
+                  return res.status(401).send('User Not Authorized')
+                }})
+            res.status(200).json({ message: 'User Logging successfull', token: exports.generateAccessToken(user1.id,user1.name,user1.email)}) 
+    }
         
     } catch (error) {
         
