@@ -20,6 +20,7 @@ myform.addEventListener('submit',async (e)=>{
             password: password.value
         })
         alert('Successfull')
+        window.location.href='http://localhost:3000/loginPage'
 
     } catch (error) {
         if(error.response.status===400){

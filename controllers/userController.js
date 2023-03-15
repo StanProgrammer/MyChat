@@ -7,9 +7,11 @@ exports.signupPage = (req, res, next) => {
     res.sendFile(path.join(rootDir, 'public', 'html', 'signup.html'))
 }
 
-exports.createUser = async (req, res, next) => {
-    console.log(req.body);
+exports.loginPage = (req, res, next) => {
+    res.sendFile(path.join(rootDir, 'public', 'html', 'login.html'))
+}
 
+exports.createUser = async (req, res, next) => {
     try{
         const name = req.body.name
         const email = req.body.email
@@ -28,5 +30,14 @@ exports.createUser = async (req, res, next) => {
     }
 }catch(err){
         console.log(err);
+    }
+}
+
+exports.checkUser=async(req,res,next)=>{
+    try {
+        console.log(req.body);
+        
+    } catch (error) {
+        
     }
 }

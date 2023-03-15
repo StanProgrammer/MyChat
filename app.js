@@ -4,11 +4,9 @@ const app = express();
 const cors=require('cors')
 const path = require('path')
 const User = require('./models/users')
-app.use(
-  cors({
-    origin:'http://localhost:3000',
-  })
-)
+app.use(cors({
+  origin: "http://127.0.0.1:5500"
+}));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json())
 
