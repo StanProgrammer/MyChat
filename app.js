@@ -4,6 +4,8 @@ const app = express();
 const cors=require('cors')
 const path = require('path')
 const User = require('./models/users')
+const Chat = require('./models/chats')
+const sequelize = require('./util/database');
 const env=require('dotenv')
 env.config()
 app.use(cors({
@@ -19,7 +21,7 @@ app.use(chatRoutes)
 
 
 app.use(express.static(path.join(__dirname, 'public')))
-User.sync()
+sequelize.sync()
 .then(
 app.listen(process.env.PORT,()=>{
   console.log('no error');
