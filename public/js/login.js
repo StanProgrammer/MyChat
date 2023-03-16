@@ -10,7 +10,7 @@ myform.addEventListener('submit',async (e)=>{
         })
         // localStorage.setItem('token',login.data.token)
         alert(login.data.message)
-        location.reload()
+        window.location.href="http://localhost:3000/home"
     } catch (error) {
         if(error.response.status===404){
             alert(error.response.data)

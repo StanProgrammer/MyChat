@@ -13,7 +13,10 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json())
 
 const userRoutes = require('./routes/userRoutes')
+const chatRoutes = require('./routes/chatRoutes')
 app.use(userRoutes)
+app.use(chatRoutes)
+
 
 app.use(express.static(path.join(__dirname, 'public')))
 User.sync()
