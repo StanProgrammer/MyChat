@@ -3,7 +3,7 @@ const rootDir = path.dirname(require.main.filename);
 const sequelize = require('../util/database');
 const Chat = require('../models/chats')
 const jwt = require('jsonwebtoken')
-const {Op} = require('sequelize');
+const User = require('../models/users')
 const env=require('dotenv')
 env.config()
 const SECRET_KEY=process.env.SECRET_KEY
@@ -52,3 +52,15 @@ exports.allChats=async(req,res,send)=>{
     }
 }
 
+exports.allUsers=async (req,res,next)=>{
+    try {
+        const users = await User.findAll({
+            raw:true,
+            
+        });
+        res.status(201).send(users)
+    } catch (error) {
+        
+    }
+    
+}

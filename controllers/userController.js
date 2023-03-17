@@ -52,7 +52,7 @@ exports.checkUser=async(req,res,next)=>{
                 if (result === false) {
                   return res.status(401).send('User Not Authorized')
                 }})
-            res.status(200).json({ message: 'User Logging successfull', token: exports.generateAccessToken(user1.id,user1.name,user1.email)}) 
+            res.status(200).json({ message: 'User Logging successfull',id:user1.id, token: exports.generateAccessToken(user1.id,user1.name,user1.email)}) 
     }
         
     } catch (error) {

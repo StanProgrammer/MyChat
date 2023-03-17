@@ -8,7 +8,8 @@ myform.addEventListener('submit',async (e)=>{
             email:email.value,
             password:password.value
         })
-        // localStorage.setItem('token',login.data.token)
+        localStorage.setItem('token',login.data.token)
+        localStorage.setItem('id',login.data.id)
         alert(login.data.message)
         window.location.href="http://localhost:3000/home"
     } catch (error) {
