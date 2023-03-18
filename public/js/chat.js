@@ -4,6 +4,7 @@ const token=localStorage.getItem('token')
 text.addEventListener("keyup", async(event)=> {
     try {
         event.preventDefault();
+
         const ul = document.getElementById('ulcls')
         if (event.keyCode === 13 && text.value!=='' ) {
             let chatObj = {
@@ -11,7 +12,7 @@ text.addEventListener("keyup", async(event)=> {
             }
             const post = await axios.post('http://localhost:3000/send', chatObj, { headers: {'Authorization': token} })
             // window.location.reload()
-            await addChats(text.value)
+            // await addChats(text.value)
             ul.scrollTop = ul.scrollHeight;
             text.value=''
             
@@ -21,27 +22,20 @@ text.addEventListener("keyup", async(event)=> {
     }
 });
 
-window.addEventListener('DOMContentLoaded', async(e) => {
-    try {
-        e.preventDefault()
-        const id=localStorage.getItem('id')
-        const get0=await axios.get('http://localhost:3000/allUsers',{ headers: {'Authorization': token} })
-        for(let i=0;i<get0.data.length;i++){
-            if(id!=get0.data[i].id){
-            addPeoples(get0.data[i].id,get0.data[i].name)
-            } 
-        }
-        const ul = document.getElementById('ulcls')
-        const get1 = await axios.get('http://localhost:3000/allChats',{ headers: {'Authorization': token} })
-        // console.log(get1.data.length);
-        for(let i=get1.data.length-1;i>=0;i--){
-            await addChats(get1.data[i].chat)
-        }
-        ul.scrollTop = ul.scrollHeight;
-    } catch (error) {
-        console.log(error);
-    }
-});
+// window.addEventListener('DOMContentLoaded', async(e) => {
+//     try {
+//         e.preventDefault()
+       
+//         const ul = document.getElementById('ulcls')
+//         const get1 = await axios.get('http://localhost:3000/allChats',{ headers: {'Authorization': token} })
+//         for(let i=get1.data.length-1;i>=0;i--){
+//             await addChats(get1.data[i].chat)
+//         }
+//         ul.scrollTop = ul.scrollHeight;
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
 
 function addChats(chats){
     const ul = document.getElementById('ulcls')
@@ -58,23 +52,41 @@ function addChats(chats){
     ul.appendChild(li)
 }
 
-function addPeoples(id,name){
-    const ula =document.getElementById('peoples')
-    const li =document.createElement('li')
-    li.id=id
-    li.innerHTML=`
-    <li class="clearfix">
-    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
-                        <div class="about">
-                            <div class="name">${name}</div>
-                            <div class="status"> <i class="fa fa-circle online"></i> online </div>
-                        </div>
-                    </li>      
-    `
-    li.addEventListener('click',()=>{
-        console.log(li.id);
-    })
-    ula.appendChild(li)
-
-}
-  
+window.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const ul = document.getElementById('ulcls')
+        let len = 0;
+    let oldMessage = localStorage.getItem("messages");
+    let oldMessages = oldMessage?JSON.parse(oldMessage):[{}];
+    const msg = oldMessages;
+    console.log(oldMessages);
+    for (let i = 1; i < oldMessages.length; i++) {
+                addChats(oldMessages[i].chat)
+            }
+    let lastMessage = (oldMessages[oldMessages.length - 1]);
+    setInterval(async () => {
+       
+        const response = await axios.get(`http://localhost:3000/allChats?lastId=${lastMessage.id}`, { headers: { 'Authorization': token } });
+        const chats = response.data.chats;
+        const length = chats.length;
+        if (len !== length) {
+            for (let i = len; i < length; i++) {
+                if(msg.length<=10){
+                    msg.push(chats[i]);
+                }else if(msg.length>10){
+                    msg.shift();
+                    msg.push(chats[i]);
+                }
+                console.log(chats[i]);
+                addChats(chats[i].chat)
+            }
+            localStorage.setItem("messages", JSON.stringify(msg));
+        }
+        len = length;
+        // ul.scrollTop = ul.scrollHeight;
+    }, 1000);
+    } catch (error) {
+        console.log(error);
+    }
+    
+})

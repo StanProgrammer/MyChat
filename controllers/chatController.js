@@ -4,6 +4,8 @@ const sequelize = require('../util/database');
 const Chat = require('../models/chats')
 const jwt = require('jsonwebtoken')
 const User = require('../models/users')
+const {Op} = require('sequelize');
+
 const env=require('dotenv')
 env.config()
 const SECRET_KEY=process.env.SECRET_KEY
@@ -19,6 +21,7 @@ exports.sendChat=async(req,res,next)=>{
         const id=user.id
         const data=await Chat.create({
             chat: req.body.chat,
+            date:req.body.date,
             userId: id
         },
 
@@ -27,23 +30,42 @@ exports.sendChat=async(req,res,next)=>{
         res.status(201).json({message:'Done'})
         
     } catch (error) {
+        console.log(error);
         await sequelizeTransaction.rollback();
         res.status(500).json({error:error})
     }
 }
 
-exports.allChats=async(req,res,send)=>{
+
+exports.allChats=async(req,res,next)=>{
     try {
-        const token = req.header('Authorization');
-        const user = jwt.verify(token, SECRET_KEY);
-        const id=user.id
+        const lastMessageId = req.query.lastId || 0;
+        console.log(lastMessageId);
+        const chats = await Chat.findAll({
+          where:{
+            id:{
+              [Op.gt]: lastMessageId
+            }
+          }
+        });
+        
+        return res.status(200).json({ chats });
+      } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Something wrong", Error: err });
+      }
+    };
+exports.sendtoChats=async(req,res,send)=>{
+    try {
+        
+        const id=req.query.id
         const data=await Chat.findAll({
             limit: 10,
             raw: true,
             where: {
               userId: id
             },
-            attributes: ['chat'], 
+            attributes: ['userId','chat','createdAt'], 
             order: [ [ 'createdAt', 'DESC' ]]
           });
         res.status(201).json(data)
@@ -51,6 +73,7 @@ exports.allChats=async(req,res,send)=>{
         console.log(error);
     }
 }
+
 
 exports.allUsers=async (req,res,next)=>{
     try {

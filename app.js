@@ -21,6 +21,8 @@ app.use(chatRoutes)
 
 
 app.use(express.static(path.join(__dirname, 'public')))
+Chat.belongsTo(User);
+User.hasMany(Chat);
 sequelize.sync()
 .then(
 app.listen(process.env.PORT,()=>{
